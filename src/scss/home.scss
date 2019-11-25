@@ -1,0 +1,46 @@
+//引入
+
+// 定义变量
+// m主:中间值 d:更暗  l:更亮
+$mYellow:#ffde59;
+$dYellow:#ffca34;
+$lYellow:#ffec76;
+$headerH:40px;
+// 样式
+// 主体
+.home{
+    width: 100%;
+    min-height: 100%;
+}
+// 背景
+.ant-layout,.ant-layout-footer{
+    background-color: #fcfcfc;
+}
+//头
+.header{
+    background: $mYellow;
+    height:$headerH ;
+    line-height: $headerH;
+}
+//LOGO
+.logo{
+    background: url(../images/GemsFang.png) no-repeat center center;
+    background-size: contain;
+    height:$headerH;
+    float: left;
+    width: $headerH;
+    margin-right: $headerH;
+    cursor: pointer;
+}
+//tabul
+//li 选中背景色
+.ant-menu.ant-menu-dark .ant-menu-item-selected{
+    background-color: $dYellow;
+    box-shadow: 1px 1px 1px 1px rgba($color: #000, $alpha: 0.3);
+}
+
+//侧边栏
+.sider{
+    background: $lYellow;
+}
+
