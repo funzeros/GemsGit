@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import '../scss/layout.scss'
-import Home from '../components/home/Home'
+import './index.scss'
+import Home from 'views/home/Home'
 
 
 export default class LayOut extends Component {

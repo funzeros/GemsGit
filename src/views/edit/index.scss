@@ -1,0 +1,15 @@
+@import '~assets/stylesheet/theme.scss';
+
+.edit-wrap{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    top: 40px;
+    left: 250px;
+    margin: auto;
+    background: #fafafa;
+    box-sizing: border-box;
+    border:  solid $mYellow;
+    border-width: 0 0 0 1px;
+    border-radius: 10px;
+}

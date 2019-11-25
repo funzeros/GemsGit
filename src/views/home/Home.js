@@ -1,8 +1,15 @@
 import React,{ Component } from 'react'
 import { Layout, Menu, Breadcrumb, Icon } from 'antd';
-import '../../scss/home.scss'
-import Artical from '../artical/Artical';
+import { CSSTransition } from 'react-transition-group'
+
+
+
+import './home.scss'
+import Artical from 'views/artical/Artical';
 import axios from 'axios';
+import { GoTop } from 'gems-gotop';
+import Edit from 'views/edit';
+
 
 const { SubMenu } = Menu;
 const { Header, Content, Footer, Sider } = Layout;
@@ -13,101 +20,84 @@ export default class Home extends Component {
         super(props);
         this.state = {
             Menu:[
-                {"id":0,"text":"首页","navs":[
+                {"id":0,"name":"index","text":"首页","navs":[
                     {
                         "id" : 0,
                         "text" : "总览",
                         "type" : "bank",
-                        "subs" : [ 
-                            {
-                                "id" : 0,
-                                "text" : "最新",
-                                "title" : "最新发布",
-                                "content" : "test"
-                            }, 
-                            {
-                                "id" : 1,
-                                "text" : "Go For It",
-                                "title" : "Go For It",
-                                "content" : "test"
-                            }
-                        ]
                     },
                     {
-                        "id":1,"text":"关于我","type":"user","subs":[
-                            {"id":3,"text":"何为Gems"},
-                            {"id":4,"text":"我的前端之缘"},
-                            {"id":5,"text":"On The Road"}
-                        ]
+                        "id":1,"text":"关于我","type":"user"
                     },
                     {
-                        "id":2,"text":"关于本站","type":"global","subs":[
-                            {"id":6,"text":"何来此站"},
-                            {"id":7,"text":"于何用"},
-                            {"id":8,"text":"To Be Continue"}
-                        ]
+                        "id":2,"text":"关于本站","type":"global"
                     }
                 ]},
-                {"id":1,"text":"学术","navs":[
+                {"id":1,"name":"skill","text":"学术","navs":[
                     {
-                        "id":0,"text":"JS","type":"code","subs":[
-                            {"id":0,"text":"更新中"}
-                        ]
+                        "id":0,"text":"JS","type":"code",
                     },
                     {
-                        "id":1,"text":"React","type":"code","subs":[
-                            {"id":100,"text":"更新中"}
-                        ]
+                        "id":1,"text":"React","type":"code"
                     },
                     {
-                        "id":2,"text":"Vue","type":"code","subs":[
-                            {"id":200,"text":"更新中"}
-                        ]
+                        "id":2,"text":"Vue","type":"code"
                     }
                 ]},
-                {"id":2,"text":"生活","navs":[
+                {"id":2,"name":"life","text":"生活","navs":[
                     {
-                        "id":0,"text":"随笔","type":"container","subs":[
-                            {"id":0,"text":"更新中"}
-                        ]
+                        "id":0,"text":"随笔","type":"container"
                     }, 
                     {
-                        "id":1,"text":"日志","type":"container","subs":[
-                            {"id":200,"text":"更新中"}
-                        ]
+                        "id":1,"text":"日志","type":"container"
                     }
                 ]},
-                {"id":3,"text":"其他","navs":[
+                {"id":3,"name":"other","text":"其他","navs":[
                     {
-                        "id":0,"text":"分享","type":"link","subs":[
-                            {"id":0,"text":"更新中"}
-                        ]
+                        "id":0,"text":"分享","type":"link"
                     },
                     {
-                        "id":1,"text":"资料","type":"book","subs":[
-                            {"id":10,"text":"更新中"}
-                        ]
+                        "id":1,"text":"资料","type":"book"
                     }
                 ]}
             ],
+            navs:null,
             breadcrumb:null,
+            breadcrumb2:[
+                {
+                    text:'加载中',
+                    subs:[{text:'加载中'}]
+                }
+            ],
             menuSelectedKeys:"0",
             navSelectedKeys:"0",
             subSelectedKeys:"0",
             subIndex:0,
-            countNum:0
+            siderWidth:100,
+            editF:false
         };
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        return {breadcrumb:prevState.Menu[prevState.menuSelectedKeys]}
+        if(prevState.navs){
+            return {
+                breadcrumb:prevState.Menu[prevState.menuSelectedKeys],
+                breadcrumb2:prevState.navs
+            }
+        }
+        return {
+            breadcrumb:prevState.Menu[prevState.menuSelectedKeys]
+            
+        }
     }
 
     async componentDidMount(){
         let table="index"
-        await axios.get(`http://172.20.10.5:9001/article?table=${table}`)
+        await axios.get(`/article?table=${table}`)
             .then(res=>{
-                console.log(res);
+                this.setState({
+                    navs:res.data
+                })
             })
             .catch(err=>{
             console.log(err);
@@ -116,13 +106,14 @@ export default class Home extends Component {
     //渲染顶部菜单
     renderHeaderMenu=()=>{
         return this.state.Menu&&this.state.Menu.map(item=>{
-            return (<Menu.Item key={item.id}>{item.text}</Menu.Item>)
+            return (<Menu.Item name={item.name} key={item.id}>{item.text}</Menu.Item>)
         });
     }
     //渲染侧边菜单
     renderSiderMenu=()=>{
-        let navs = this.state.Menu[this.state.menuSelectedKeys].navs;
-        return navs&&navs.map(item=>{
+        // let navs = this.state.Menu[this.state.menuSelectedKeys].navs;
+        let navs=this.state.navs;
+        return navs&&(navs.map(item=>{
             this.renderSubItem=()=>{
                 let subs=item.subs;
                 return subs&&subs.map(sub=>{
@@ -145,7 +136,7 @@ export default class Home extends Component {
                 </SubMenu>
             )
 
-        });
+        }));
     }
     renderSiderMenuWrap=()=>{
         const { subSelectedKeys,navSelectedKeys } = this.state;
@@ -163,16 +154,19 @@ export default class Home extends Component {
     }
     //修改顶部菜单默认KEY
     changeKey=async (e)=>{
+        // console.log(e);
         this.setState({
             menuSelectedKeys:e.key,
             navSelectedKeys:"0",
             subSelectedKeys:"0",
             subIndex:0
         });
-        let table="index"
-        await axios.get(`http://172.20.10.5:9001/article?table=${table}`)
+        let table=e.item.props.name;
+        await axios.get(`/article?table=${table}`)
             .then(res=>{
-                console.log(res);
+                this.setState({
+                    navs:res.data
+                })
             })
             .catch(err=>{
             console.log(err);
@@ -188,11 +182,19 @@ export default class Home extends Component {
     }
     
     showIndex=(e)=>{
-        this.setState({countNum:this.state.countNum+1})
-        console.log("Hello , I am Gems!",this.state.countNum);
+        // console.log("Hello , I am Gems!");
+        this.setState({
+            editF:!this.state.editF
+        })
     }   
+
+    changeSiderWith=(w)=>{
+        this.setState({
+            siderWidth:w
+        })
+    }
     render() {
-        const { breadcrumb,menuSelectedKeys,navSelectedKeys,subIndex } = this.state;
+        const { breadcrumb,breadcrumb2,menuSelectedKeys,navSelectedKeys,subIndex,siderWidth,editF } = this.state;
         return (
             <Layout>
                 {/* 头部 */}
@@ -214,20 +216,35 @@ export default class Home extends Component {
                 <Content style={{ padding: '0 50px' }}>
                 <Breadcrumb style={{ margin: '16px 0' }}>
                     <Breadcrumb.Item>{breadcrumb.text}</Breadcrumb.Item>
-                    <Breadcrumb.Item>{breadcrumb.navs[navSelectedKeys].text}</Breadcrumb.Item>
-                    <Breadcrumb.Item>{breadcrumb.navs[navSelectedKeys].subs[subIndex].text}</Breadcrumb.Item>
+                    <Breadcrumb.Item>{breadcrumb2[navSelectedKeys].text}</Breadcrumb.Item>
+                    <Breadcrumb.Item>{breadcrumb2[navSelectedKeys].subs[subIndex].text}</Breadcrumb.Item>
                 </Breadcrumb>
                 <Layout style={{ padding: '24px 0', background: '#fff' }}>
-                    <Sider width={200} style={{ background: '#fff' }}>
+                    <Sider  width={siderWidth} onMouseEnter={()=>{this.changeSiderWith(200)}} onMouseLeave={()=>{this.changeSiderWith(100)}} style={{ background: '#fff' }}>
                         {this.renderSiderMenuWrap()}
                     </Sider>
                     <Content style={{ padding: '0 24px', minHeight: 280 }}>
-                        <Artical/>
+                        <Artical content={ breadcrumb2[navSelectedKeys].subs[subIndex] }/>
                     </Content>
                 </Layout>
                 </Content>
                 {/* 尾部 */}
                 <Footer style={{ textAlign: 'center' }}>Gems' Web ©2019 Created by Gems Fang</Footer>
+                {/* {editF&&( */}
+                <CSSTransition
+                in = { editF } //in的值必须变化的
+                timeout = { 0 } // 动画的延迟时间
+                unmountOnExit
+                classNames = {{
+                  enter: 'animated', // 刚刚进入那一刻
+                  enterActive: 'slideInRight',// 进入的整个过程
+                  exit: 'animated',//离开的那一刻
+                  exitActive: 'slideOutRight'// 离开的过程
+                }}>
+                    <Edit/>
+                </CSSTransition> 
+                {/* )} */}
+                <GoTop />
             </Layout>
         )
     }

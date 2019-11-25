@@ -1,10 +1,7 @@
 //引入
 
-// 定义变量
-// m主:中间值 d:更暗  l:更亮
-$mYellow:#ffde59;
-$dYellow:#ffca34;
-$lYellow:#ffec76;
+@import '~assets/stylesheet/theme.scss';
+
 $headerH:40px;
 // 样式
 // 主体
@@ -24,7 +21,7 @@ $headerH:40px;
 }
 //LOGO
 .logo{
-    background: url(../images/GemsFang.png) no-repeat center center;
+    background: url($GemsLogo) no-repeat center center;
     background-size: contain;
     height:$headerH;
     float: left;
