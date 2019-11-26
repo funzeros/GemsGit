@@ -6,6 +6,7 @@
     border: 1px solid #ccc;
     background: #fff;
     white-space:pre-wrap;
+    overflow: auto;
 
     h2 {
         font-weight: 600;
@@ -27,7 +28,7 @@
         list-style-type: disc;
     }
 
-    img {
+    .img {
         text-align: center;
     }
 
