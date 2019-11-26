@@ -7,6 +7,7 @@
     "axios": "^0.19.0",
     "babel-plugin-import": "^1.12.2",
     "classname": "0.0.0",
+    "copy-to-clipboard": "^3.2.0",
     "gems-gotop": "file:src/gems-gotop",
     "http-proxy-middleware": "^0.20.0",
     "react": "^16.12.0",

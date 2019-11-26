@@ -7,7 +7,6 @@ import { CSSTransition } from 'react-transition-group'
 import './home.scss'
 import Artical from 'views/artical/Artical';
 import axios from 'axios';
-import { GoTop } from 'gems-gotop';
 import Edit from 'views/edit';
 
 
@@ -74,7 +73,8 @@ export default class Home extends Component {
             subSelectedKeys:"0",
             subIndex:0,
             siderWidth:100,
-            editF:false
+            editF:false,
+            menuName:"index"
         };
     }
 
@@ -91,9 +91,12 @@ export default class Home extends Component {
         }
     }
 
+    
+
     async componentDidMount(){
-        let table="index"
-        await axios.get(`/article?table=${table}`)
+        let query=this.getQuery();
+        let table=query.table||'index';
+        await axios.get(`/api/article?table=${table}`)
             .then(res=>{
                 this.setState({
                     navs:res.data
@@ -102,6 +105,34 @@ export default class Home extends Component {
             .catch(err=>{
             console.log(err);
         });
+        this.setState({
+            navSelectedKeys:query.nid||'0',
+            subSelectedKeys:query.sid||'0',
+            subIndex:query.iid||0,
+            menuSelectedKeys:query.menu||0
+        })
+        
+    }
+
+    componentDidUpdate(){
+    }
+    // 获取query
+    getQuery=()=>{
+        let query=window.location.search.substring(1).split('&').map(item=>{
+            return item.split('=');
+
+        });
+        let obj ={}
+        for(let item of query){
+            obj[item[0]]=item[1];
+        }
+        return obj;
+    } 
+
+    setSearch=()=>{
+        const {navSelectedKeys,subSelectedKeys,menuName,subIndex,menuSelectedKeys } = this.state;
+        let search=`nid=${navSelectedKeys}&sid=${subSelectedKeys}&table=${menuName}&iid=${subIndex}&menu=${menuSelectedKeys}`;
+        return search;
     }
     //渲染顶部菜单
     renderHeaderMenu=()=>{
@@ -155,14 +186,15 @@ export default class Home extends Component {
     //修改顶部菜单默认KEY
     changeKey=async (e)=>{
         // console.log(e);
+        let table=e.item.props.name;
         this.setState({
             menuSelectedKeys:e.key,
             navSelectedKeys:"0",
             subSelectedKeys:"0",
-            subIndex:0
+            subIndex:0,
+            menuName:table
         });
-        let table=e.item.props.name;
-        await axios.get(`/article?table=${table}`)
+        await axios.get(`/api/article?table=${table}`)
             .then(res=>{
                 this.setState({
                     navs:res.data
@@ -181,7 +213,7 @@ export default class Home extends Component {
         
     }
     
-    showIndex=(e)=>{
+    showIndex=()=>{
         // console.log("Hello , I am Gems!");
         this.setState({
             editF:!this.state.editF
@@ -196,7 +228,7 @@ export default class Home extends Component {
     render() {
         const { breadcrumb,breadcrumb2,menuSelectedKeys,navSelectedKeys,subIndex,siderWidth,editF } = this.state;
         return (
-            <Layout>
+            <Layout className="home">
                 {/* 头部 */}
                 <Header className="header">
                     <div className="logo" onClick={this.showIndex}/>
@@ -204,7 +236,7 @@ export default class Home extends Component {
                     <Menu className="header"
                     theme="dark"
                     mode="horizontal"
-                    defaultSelectedKeys={menuSelectedKeys}
+                    selectedKeys={menuSelectedKeys||'0'}
                     style={{ lineHeight: '40px' }}
                     onClick={this.changeKey}
                     >
@@ -214,7 +246,7 @@ export default class Home extends Component {
                 </Header>
                 {/* 内容 */}
                 <Content style={{ padding: '0 50px' }}>
-                <Breadcrumb style={{ margin: '16px 0' }}>
+                <Breadcrumb style={{ margin: '56px 0 16px' }}>
                     <Breadcrumb.Item>{breadcrumb.text}</Breadcrumb.Item>
                     <Breadcrumb.Item>{breadcrumb2[navSelectedKeys].text}</Breadcrumb.Item>
                     <Breadcrumb.Item>{breadcrumb2[navSelectedKeys].subs[subIndex].text}</Breadcrumb.Item>
@@ -224,27 +256,19 @@ export default class Home extends Component {
                         {this.renderSiderMenuWrap()}
                     </Sider>
                     <Content style={{ padding: '0 24px', minHeight: 280 }}>
-                        <Artical content={ breadcrumb2[navSelectedKeys].subs[subIndex] }/>
+                        <Artical search={this.setSearch()} content={ breadcrumb2[navSelectedKeys].subs[subIndex] }/>
                     </Content>
                 </Layout>
                 </Content>
                 {/* 尾部 */}
                 <Footer style={{ textAlign: 'center' }}>Gems' Web ©2019 Created by Gems Fang</Footer>
-                {/* {editF&&( */}
                 <CSSTransition
                 in = { editF } //in的值必须变化的
-                timeout = { 0 } // 动画的延迟时间
+                timeout = { 300 } // 动画的延迟时间
                 unmountOnExit
-                classNames = {{
-                  enter: 'animated', // 刚刚进入那一刻
-                  enterActive: 'slideInRight',// 进入的整个过程
-                  exit: 'animated',//离开的那一刻
-                  exitActive: 'slideOutRight'// 离开的过程
-                }}>
-                    <Edit/>
+                classNames = "fade">
+                    <Edit key="12314"/>
                 </CSSTransition> 
-                {/* )} */}
-                <GoTop />
             </Layout>
         )
     }

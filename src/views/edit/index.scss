@@ -12,4 +12,10 @@
     border:  solid $mYellow;
     border-width: 0 0 0 1px;
     border-radius: 10px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    .info{
+        display: flex;
+    }
 }

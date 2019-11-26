@@ -7,7 +7,7 @@ $headerH:40px;
 // 主体
 .home{
     width: 100%;
-    min-height: 100%;
+    min-height: 100vh;
 }
 // 背景
 .ant-layout,.ant-layout-footer{
@@ -19,6 +19,14 @@ $headerH:40px;
     height:$headerH ;
     line-height: $headerH;
 }
+header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9;
+}
+
 //LOGO
 .logo{
     background: url($GemsLogo) no-repeat center center;
