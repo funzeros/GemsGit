@@ -21,7 +21,7 @@ export default class Artical extends Component {
         }; 
     }
     copyUrl=()=>{
-        if(copy(window.location.href+'?'+this.state.search)){
+        if(copy('http://'+window.location.host+'?'+this.state.search)){
             message.success('链接复制成功');
         }else{
             message.error('链接复制失败');
