@@ -1,5 +1,7 @@
 import React from 'react';
 import './App.css';
+import 'utils/rem.js';
+
 import LayOut from './layout';
 
 function App() {

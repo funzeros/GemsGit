@@ -1,0 +1,53 @@
+@import '~assets/stylesheet/theme.scss';
+$headerH:.4rem;
+
+body,html,#root,.app,.layout,.home{
+    height: 100%;
+    background-color: #fcfcfc;
+}
+
+.home{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .header{
+        background: $mYellow;
+        height:$headerH ;
+        line-height: $headerH;
+    }
+    header{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 9;
+        .ant-menu-item{
+            height:$headerH;
+            line-height: $headerH;
+            font-size: 0.12rem;
+        }
+        .ant-menu.ant-menu-dark .ant-menu-item-selected{
+            height:$headerH ;
+            line-height: $headerH;
+            font-size: 0.12rem;
+            background-color: $dYellow;
+            box-shadow: 1px 1px 1px 1px rgba($color: #000, $alpha: 0.3);
+        }
+    }
+    main.ant-layout-content{
+        width: 100%;
+        padding: 0 0.1rem!important;
+    }
+    .ant-menu-item,.ant-menu-submenu-title span,.ant-menu-item.ant-menu-item-active.ant-menu-item-selected{
+        font-size: 0.12rem;
+    }
+    .ant-spin-nested-loading,.ant-spin-container{
+        width: 100%;
+    }
+    .ant-layout-sider.ant-layout-sider-dark{
+        overflow: hidden;
+    }
+  
+}

@@ -1,0 +1,7 @@
+@media all and(max-width:800px){
+    @import './home_mobile.scss';//设备宽度小于600用mobile样式
+}
+
+@media all and (min-width: 800px){
+    @import './home.scss';//设备宽度大于600用PC样式
+}

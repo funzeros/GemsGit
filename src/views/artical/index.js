@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Icon,message } from 'antd'
-import './artical.scss'
+import './index.scss'
 import copy from 'copy-to-clipboard';
 
 

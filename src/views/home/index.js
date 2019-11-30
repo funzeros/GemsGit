@@ -1,17 +1,19 @@
 import React,{ Component } from 'react'
-import { Layout, Menu, Breadcrumb, Icon } from 'antd';
+import { Layout, Menu, Breadcrumb, Icon ,Spin} from 'antd';
 import { CSSTransition } from 'react-transition-group'
 
 
 
-import './home.scss'
-import Artical from 'views/artical/Artical';
+import './index.scss'
+
+import Artical from 'views/artical';
 import axios from 'axios';
 import Edit from 'views/edit';
+import Foot from 'components/footer';
 
 
 const { SubMenu } = Menu;
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Content,  Sider } = Layout;
 
 
 export default class Home extends Component {
@@ -72,9 +74,11 @@ export default class Home extends Component {
             navSelectedKeys:"0",
             subSelectedKeys:"0",
             subIndex:0,
-            siderWidth:100,
+            siderWidth:window.innerWidth<800?30:200,
             editF:false,
-            menuName:"index"
+            menuName:"index",
+            screenFlag:window.innerWidth<800?true:false,
+            loading:false
         };
     }
 
@@ -111,10 +115,27 @@ export default class Home extends Component {
             subIndex:query.iid||0,
             menuSelectedKeys:query.menu||0
         })
-        
+       
+        window.onresize = ()=>{
+            clearTimeout(this.timer);//设置延时对窗口大小改变进行节流
+            this.timer=setTimeout(()=>{
+                if(window.innerWidth<=800&&!this.state.screenFlag){
+                    this.setState({
+                        screenFlag:true,
+                        siderWidth:30
+                    })
+                }else if(window.innerWidth>800&&this.state.screenFlag){
+                    this.setState({
+                        screenFlag:false,
+                        siderWidth:200
+                    }) 
+                }
+            },500)    
+        }
     }
 
     componentDidUpdate(){
+        
     }
     // 获取query
     getQuery=()=>{
@@ -184,7 +205,7 @@ export default class Home extends Component {
         )
     }
     //修改顶部菜单默认KEY
-    changeKey=async (e)=>{
+    changeKey= (e)=>{
         // console.log(e);
         let table=e.item.props.name;
         this.setState({
@@ -194,7 +215,7 @@ export default class Home extends Component {
             subIndex:0,
             menuName:table
         });
-        await axios.get(`/api/article?table=${table}`)
+        axios.get(`/api/article?table=${table}`)
             .then(res=>{
                 this.setState({
                     navs:res.data
@@ -203,6 +224,28 @@ export default class Home extends Component {
             .catch(err=>{
             console.log(err);
         });
+        axios.interceptors.request.use((config)=> {
+            // 在发送请求之前做些什么
+            this.setState({
+                loading:true
+            })
+            return config;
+        }, function (error) {
+            // 对请求错误做些什么
+            return Promise.reject(error);
+        });
+            // 添加响应拦截器
+        axios.interceptors.response.use( (response)=> {
+            // 对响应数据做点什么
+            this.setState({
+                loading:false
+            })
+            return response;
+            }, function (error) {
+            // 对响应错误做点什么
+            return Promise.reject(error);
+        });
+
     }
     changeNavKey=(e)=>{
         this.setState({
@@ -221,47 +264,51 @@ export default class Home extends Component {
     }   
 
     changeSiderWith=(w)=>{
-        this.setState({
-            siderWidth:w
-        })
+        if(this.state.screenFlag){
+            this.setState({
+                siderWidth:w
+            })
+        }  
     }
     render() {
-        const { breadcrumb,breadcrumb2,menuSelectedKeys,navSelectedKeys,subIndex,siderWidth,editF } = this.state;
+        const { loading,screenFlag,breadcrumb,breadcrumb2,menuSelectedKeys,navSelectedKeys,subIndex,siderWidth,editF } = this.state;
         return (
             <Layout className="home">
                 {/* 头部 */}
-                <Header className="header">
-                    <div className="logo" onClick={this.showIndex}/>
-                    {/* 菜单 */}
-                    <Menu className="header"
-                    theme="dark"
-                    mode="horizontal"
-                    selectedKeys={menuSelectedKeys||'0'}
-                    style={{ lineHeight: '40px' }}
-                    onClick={this.changeKey}
-                    >
-                    {/* 渲染头部菜单 */}
-                    {this.renderHeaderMenu()}
-                </Menu>
-                </Header>
-                {/* 内容 */}
-                <Content style={{ padding: '0 50px' }}>
-                <Breadcrumb style={{ margin: '56px 0 16px' }}>
-                    <Breadcrumb.Item>{breadcrumb.text}</Breadcrumb.Item>
-                    <Breadcrumb.Item>{breadcrumb2[navSelectedKeys].text}</Breadcrumb.Item>
-                    <Breadcrumb.Item>{breadcrumb2[navSelectedKeys].subs[subIndex].text}</Breadcrumb.Item>
-                </Breadcrumb>
-                <Layout style={{ padding: '24px 0', background: '#fff' }}>
-                    <Sider  width={siderWidth} onMouseEnter={()=>{this.changeSiderWith(200)}} onMouseLeave={()=>{this.changeSiderWith(100)}} style={{ background: '#fff' }}>
-                        {this.renderSiderMenuWrap()}
-                    </Sider>
-                    <Content style={{ padding: '0 24px', minHeight: 280 }}>
-                        <Artical search={this.setSearch()} content={ breadcrumb2[navSelectedKeys].subs[subIndex] }/>
+                <Spin tip="Loading..." spinning={loading}  >
+                    <Header className="header">
+                        <div className="logo" onClick={this.showIndex}/>
+                        {/* 菜单 */}
+                        <Menu className="header"
+                        theme="dark"
+                        mode="horizontal"
+                        selectedKeys={menuSelectedKeys||'0'}
+                        style={{ lineHeight: '40px' }}
+                        onClick={this.changeKey}
+                        >
+                        {/* 渲染头部菜单 */}
+                        {this.renderHeaderMenu()}
+                    </Menu>
+                    </Header>
+                    {/* 内容 */}
+                    <Content style={{ padding: '0 50px' }}>
+                    <Breadcrumb style={{ margin: '56px 0 16px' }}>
+                        <Breadcrumb.Item>{breadcrumb.text}</Breadcrumb.Item>
+                        <Breadcrumb.Item>{breadcrumb2[navSelectedKeys].text}</Breadcrumb.Item>
+                        <Breadcrumb.Item>{breadcrumb2[navSelectedKeys].subs[subIndex].text}</Breadcrumb.Item>
+                    </Breadcrumb>
+                    <Layout style={{ padding: '24px 0', background: '#fff' }}>
+                        <Sider   width={siderWidth} onMouseEnter={()=>{this.changeSiderWith(200)}} onMouseLeave={()=>{this.changeSiderWith(30)}} style={{ background: '#fff' }}>
+                            {this.renderSiderMenuWrap()}
+                        </Sider>
+                        <Content style={{ padding: '0 24px', minHeight: 280 }}>
+                            <Artical search={this.setSearch()} content={ breadcrumb2[navSelectedKeys].subs[subIndex] }/>
+                        </Content>
+                    </Layout>
                     </Content>
-                </Layout>
-                </Content>
-                {/* 尾部 */}
-                <Footer style={{ textAlign: 'center' }}>Gems' Web ©2019 Created by Gems Fang</Footer>
+                    {/* 尾部 */}
+                    {!screenFlag&&<Foot/>}
+                </Spin>
                 <CSSTransition
                 in = { editF } //in的值必须变化的
                 timeout = { 300 } // 动画的延迟时间

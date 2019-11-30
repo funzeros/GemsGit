@@ -2,15 +2,19 @@
 
 
 .artical{
-    font-size: 15px;
+    font-size: 0.12rem!important;
+    span,div,p,a{
+        font-size: 0.12rem;
+    }
     h2{
         font-weight: 600;
+        font-size: 0.14rem;
     }
 
     .code{
         display: block;
         white-space:pre-wrap;
-        padding: 10px;
+        padding: 0.05rem;
         background: #fcfcfc;
         color: royalblue;
     }
@@ -21,9 +25,11 @@
         text-align: center;
     }
     .share{
-        font-size: 30px;
+        position:fixed;
+        right:0.1rem;
+        top:0.5rem;
+        font-size:0.2rem;
         color: $mYellow;
-        float: right;
         cursor: pointer;
     }
 }
